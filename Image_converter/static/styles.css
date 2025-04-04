@@ -1,0 +1,18 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+    margin: 50px;
+}
+.upload{
+    padding-top: 100px;
+}
+.file{
+    padding-left: 450px;
+}
+form {
+    margin-top: 20px;
+}
+.container{
+    padding-top: 50px;
+    background-color: rgb(194, 205, 216);
+}

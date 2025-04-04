@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to Greyscale Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-muted">Grayscale Conversion</h1><hr>
+        <div class="upload">
+        <h2 class="text-success">Upload an Image to Convert to Grayscale</h2>
+        <form action="/" method="post" enctype="multipart/form-data" class="well well-lg">
+            <input type="file" name="file" class="file" required><br>
+            <button type="submit" class="btn btn-success">Upload</button>
+        </form></div>
+
+    </div>
+</body>
+</html>
+
+
