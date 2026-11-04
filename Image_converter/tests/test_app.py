@@ -251,3 +251,25 @@ def test_tests_do_not_touch_real_uploads(client):
 def test_unusable_names_rejected_cleanly(client, tmp_path, filename):
     assert upload(client, png_bytes(), filename).status_code == 400
     assert files(tmp_path) == []
+
+
+def test_unexpected_exception_cleans_partial_output(client, tmp_path, monkeypatch):
+    real = cv2.imwrite
+
+    def write_then_fail(path, img, *a):
+        real(path, img)  # partial/real output now exists on disk
+        raise ValueError("unexpected")
+    monkeypatch.setattr(app_module.cv2, "imwrite", write_then_fail)
+    monkeypatch.setitem(app_module.app.config, "PROPAGATE_EXCEPTIONS", False)
+    r = upload(client, png_bytes())
+    assert r.status_code == 500
+    assert "unexpected" not in r.get_data(as_text=True)
+    assert files(tmp_path) == []
+
+
+def test_non_image_mime_logs_warning_but_succeeds(client, caplog):
+    with caplog.at_level("WARNING", logger="app"):
+        r = post_with_mime(client, png_bytes(), "a.png", "text/html")
+    assert r.status_code == 200
+    assert any("Declared MIME type" in rec.getMessage() and "text/html" in rec.getMessage()
+               for rec in caplog.records)

@@ -159,21 +159,25 @@ def upload_file():
     original_path = os.path.join(folder, original_name)
     gray_path = os.path.join(folder, gray_name)
 
+    success = False
     try:
         os.makedirs(folder, exist_ok=True)
         uploaded_file.save(original_path)
         check_image(original_path, extension)
         convert_to_grayscale(original_path, gray_path)
+        success = True
     except UploadError as exc:
-        safe_remove(gray_path)
         return render_error(exc.message, exc.status)
     except (OSError, cv2.error):
         logger.exception("Image processing failed")
-        safe_remove(gray_path)
         return render_error("Could not process the image. Please try again.", 500)
     finally:
-        # The original is never served; always remove it.
+        # The original is never served; always remove it. Remove any partial
+        # grayscale output too unless conversion succeeded, even if an
+        # unexpected exception is propagating.
         safe_remove(original_path)
+        if not success:
+            safe_remove(gray_path)
 
     return render_template(
         "index.html",

@@ -38,9 +38,11 @@ Image_converter/
 |   `-- styles.css
 |-- templates/
 |   `-- index.html
+|-- pytest.ini
 |-- tests/
+|   |-- conftest.py
 |   `-- test_app.py
-`-- uploads/          (original and grayscale images are stored here)
+`-- uploads/          (generated grayscale images; originals are temporary and deleted)
 docs/architecture/    (architecture doc, ADR 0001, sequence diagram)
 ```
 
