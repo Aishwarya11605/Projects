@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to Greyscale Converter</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
+          crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
@@ -16,6 +18,18 @@
             <input type="file" name="file" class="file" required><br>
             <button type="submit" class="btn btn-success">Upload</button>
         </form></div>
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endif %}
+
+        {% if preview_url %}
+        <div class="result">
+            <h2 class="text-success">Grayscale Result</h2>
+            <img src="{{ preview_url }}" alt="Grayscale image" class="img-responsive center-block img-thumbnail">
+            <p><a href="{{ download_url }}" class="btn btn-primary">Download</a></p>
+        </div>
+        {% endif %}
 
     </div>
 </body>

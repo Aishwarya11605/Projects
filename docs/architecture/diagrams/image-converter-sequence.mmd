@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Flask App as App
+    participant File System as FS
+    participant OpenCV as OCV
+
+    User->>Browser: Select file, click Upload
+    Browser->>App: POST / (multipart/form-data)
+    App->>App: Validate file (present, extension, content, dimensions; MIME advisory)
+    App->>App: Sanitize name (secure_filename) + gen UUID
+    App->>FS: Save original image to uploads/ (temporary)
+    App->>OCV: imread original
+    OCV-->>App: Image matrix or None
+    App->>App: If None -> error message (cleanup)
+    App->>OCV: cvtColor to grayscale
+    App->>FS: write grayscale image to uploads/
+    App->>FS: delete original image
+    App-->>Browser: 200 HTML (includes preview URL + download URL)
+
+    Browser->>App: GET /uploads/<grayscale file> (preview)
+    App->>FS: read file
+    App-->>Browser: 200 image/* (nosniff, no-store)
+
+    Browser->>App: GET /download/<grayscale file>
+    App->>FS: read file
+    App-->>Browser: 200 attachment (friendly filename)
