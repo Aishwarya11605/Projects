@@ -42,6 +42,14 @@ Negative:
 ## Amendment 2026-11-04 (code review findings)
 - The original upload is a temporary file: it is deleted after conversion (success or failure) and is never served. Only generated grayscale files remain in `uploads/`.
 - `/uploads/<filename>` and `/download/<filename>` serve only filenames matching `grayscale_<32 hex chars>_<safe name>.<allowed extension>`; anything else returns 404. Responses carry `X-Content-Type-Options: nosniff`, and image responses carry `Cache-Control: no-store`.
-- Validation is strengthened: extension whitelist (png, jpg, jpeg, bmp, webp), declared MIME type check, content/extension match via Pillow header inspection, and a maximum of 8000 px per side and 40 megapixels (checked before OpenCV decodes the image). Upload size limit is 5 MB.
+- Validation is strengthened: extension whitelist (png, jpg, jpeg, bmp, webp), content/extension match via Pillow header inspection, and a maximum of 8000 px per side and 40 megapixels (checked before OpenCV decodes the image). Upload size limit is 5 MB.
 - Filesystem and OpenCV failures (save, imwrite, remove) are handled: partial files are removed and a generic error (HTTP 500) is shown.
 - Flask debug mode is off by default (enable with `FLASK_DEBUG=1`).
+
+### Second review round (2026-11-04)
+- The client-declared MIME type is advisory only (a mismatch is only logged). Validation relies on actual content: Pillow header inspection (format must match the extension) and OpenCV decoding.
+- Pillow decompression-bomb protection is configured explicitly via `Image.MAX_IMAGE_PIXELS`; both `DecompressionBombWarning` and `DecompressionBombError` return HTTP 413 and clean up.
+- Additional response headers: `Content-Security-Policy` (`default-src 'none'`; styles from `'self'` and `https://maxcdn.bootstrapcdn.com`; fonts from that host for Glyphicons; images from `'self'`; no inline script/style; `frame-ancestors 'none'`), `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY`.
+- Downloads use a friendly name (`grayscale_<original name>.<validated extension>`) via `Content-Disposition`; the stored name still matches the strict serving allowlist.
+- Stored names are always built from a sanitized, length-limited stem and validated against the serving allowlist before saving; unusable names are rejected with HTTP 400.
+- Dependencies are pinned to exact versions tested on Python 3.14.8.

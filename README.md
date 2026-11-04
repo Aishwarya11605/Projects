@@ -18,13 +18,15 @@ A simple Flask web application that lets users upload an image, converts it to g
 | `/uploads/<filename>` | GET | Serves a generated grayscale image for in-browser preview |
 | `/download/<filename>` | GET | Serves a generated grayscale image as a download (attachment) |
 
-Only generated grayscale files (`grayscale_<id>_<name>`) are served; any other filename returns 404. Responses include `X-Content-Type-Options: nosniff`, and images are sent with `Cache-Control: no-store`.
+Only generated grayscale files (`grayscale_<id>_<name>`) are served; any other filename returns 404. Responses include `X-Content-Type-Options: nosniff`, and images are sent with `Cache-Control: no-store`. All responses also carry a Content-Security-Policy (only `'self'` plus the Bootstrap CDN host for styles and fonts; no inline scripts or styles; `frame-ancestors 'none'`), `Referrer-Policy: no-referrer` and `X-Frame-Options: DENY`.
+
+Downloads use a friendly filename such as `grayscale_photo.jpg` (the original validated extension is kept); the stored file name contains a random id.
 
 ## Upload limits
 - Allowed extensions: png, jpg, jpeg, bmp, webp
 - Maximum size: 5 MB (larger uploads return HTTP 413)
-- Declared MIME type must be an image type, and the file content must match its extension (checked with Pillow)
-- Maximum dimensions: 8000 px per side and 40 megapixels (HTTP 413)
+- The client-declared MIME type is advisory only. The real validation is on file content: Pillow checks the image header and the format must match the extension, then OpenCV decodes it
+- Maximum dimensions: 8000 px per side and 40 megapixels (HTTP 413). Pillow decompression-bomb protection is configured explicitly (`Image.MAX_IMAGE_PIXELS`), and bomb warnings/errors also return HTTP 413
 - Invalid input returns HTTP 400 with an error message on the page.
 
 ## Project Structure
@@ -47,6 +49,8 @@ docs/architecture/    (architecture doc, ADR 0001, sequence diagram)
 - HTML, CSS (Bootstrap 3.4.1 via CDN with SRI)
 
 ## How to run
+Tested with Python 3.14.8. Dependencies in `requirements.txt` are pinned to the exact versions used in testing.
+
 1. Install dependencies:
    ```
    cd Image_converter

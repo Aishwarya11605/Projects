@@ -8,7 +8,7 @@ sequenceDiagram
 
     User->>Browser: Select file, click Upload
     Browser->>App: POST / (multipart/form-data)
-    App->>App: Validate file (present, extension, MIME, content, dimensions)
+    App->>App: Validate file (present, extension, content, dimensions; MIME advisory)
     App->>App: Sanitize name (secure_filename) + gen UUID
     App->>FS: Save original image to uploads/ (temporary)
     App->>OCV: imread original
@@ -25,4 +25,4 @@ sequenceDiagram
 
     Browser->>App: GET /download/<grayscale file>
     App->>FS: read file
-    App-->>Browser: 200 attachment
+    App-->>Browser: 200 attachment (friendly filename)
