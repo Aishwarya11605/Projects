@@ -2,7 +2,7 @@
 
 This document translates the approved implementation plan into actionable architecture guidance for the existing project in ``Image_converter/``.
 
-- Repo: `Aishwaya11605/Projects`
+- Repo: `Aishwarya11605/Projects`
 - Module: ``Image_converter/``
 - Stack: Python, Flask, OpenCV (opencv-python), Bootstrap for basic UI
 - Scope: architecture documentation only (does not implement app code)
@@ -23,3 +23,4 @@ Core building blocks:
 
 # Non-goals
 - No new cloud storage, database, or containerization is introduced.
+- Original uploads are temporary and deleted after conversion; only generated grayscale files are served (see ADR 0001 Amendment).

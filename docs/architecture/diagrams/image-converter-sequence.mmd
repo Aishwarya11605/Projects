@@ -8,21 +8,21 @@ sequenceDiagram
 
     User->>Browser: Select file, click Upload
     Browser->>App: POST / (multipart/form-data)
-    App->>App: Validate file present & non-empty
+    App->>App: Validate file (present, extension, MIME, content, dimensions)
     App->>App: Sanitize name (secure_filename) + gen UUID
-    App->>FS: Save original image to uploads/s
+    App->>FS: Save original image to uploads/ (temporary)
     App->>OCV: imread original
     OCV-->>App: Image matrix or None
-    App->>App: If None -> error message
+    App->>App: If None -> error message (cleanup)
     App->>OCV: cvtColor to grayscale
     App->>FS: write grayscale image to uploads/
+    App->>FS: delete original image
     App-->>Browser: 200 HTML (includes preview URL + download URL)
 
-    Browser->>App: GET /uploads/<f>
-// preview
+    Browser->>App: GET /uploads/<grayscale file> (preview)
     App->>FS: read file
-    App-->>Browser: 200 image/<>content-type>
+    App-->>Browser: 200 image/* (nosniff, no-store)
 
-    Browser->>App: GET /download/<f>
+    Browser->>App: GET /download/<grayscale file>
     App->>FS: read file
     App-->>Browser: 200 attachment
